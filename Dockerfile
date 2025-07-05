@@ -1,24 +1,20 @@
 FROM php:8.2-cli
 
-# Composer орнату
+# Composer және қажетті пакеттер
 RUN apt-get update && apt-get install -y unzip curl libzip-dev zip \
     && docker-php-ext-install zip
 
-# Composer
+# Composer орнату
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Жоба файлын көшіру
 WORKDIR /app
 COPY . /app
 
-# Composer install
+# Laravel кэштерін тазалау және composer install
 RUN composer install
-
-# Laravel key generate үшін PHP artisan
-RUN php artisan config:clear || true
+RUN chmod -R 777 storage bootstrap/cache
 
 EXPOSE 8000
 
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000", "--public-path=public"]
-
-
+# ✅ Міне дұрыс CMD:
+CMD ["php", "-S", "0.0.0.0:8000", "-t", "public"]
